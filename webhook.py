@@ -18,26 +18,23 @@ async def cmd_start(message: types.Message):
         [InlineKeyboardButton(text="💰 CaspianCoin Al", web_app=WebAppInfo(url="https://caspiancoin.gumroad.com/l/oxnhw"))]
     ])
     await message.answer(
-        text="🌊 CaspianCoin — Xəzərdən ilhamlanan rəqəmsal valyuta\n\nAşağıdakı düyməyə kliklə!",
+        text="🌊 CaspianCoin — Xəzərdən ilhamlanan, yerli və dayanıqlı rəqəmsal valyuta\n\nAşağıdakı düyməyə kliklə!",
         reply_markup=keyboard,
         parse_mode="Markdown"
     )
 
 async def on_startup(app):
     await bot.delete_webhook(drop_pending_updates=True)
-    await bot.set_webhook("https://ccoin-bot.onrender.com/")  # Buraya öz URL-in yazacaqsan
+    await bot.set_webhook("https://ccoin-bot.onrender.com/")
 
 async def on_shutdown(app):
     await bot.delete_webhook()
 
 async def handle(request):
-    try:
-        data = await request.json()
-        update = types.Update(**data)
-        await dp.feed_update(update)  # Aiogram 3.x üçün düzgün metoddur
-    except Exception as e:
-        logging.exception("Exception while handling update:")
-        return web.Response(status=500)
+    data = await request.json()
+    print("Gələn update:", data)
+    update = types.Update(**data)
+    await dp.feed_update(update)
     return web.Response(text="OK")
 
 app = web.Application()
@@ -47,5 +44,4 @@ app.on_shutdown.append(on_shutdown)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    port = int(os.environ.get("PORT", 10000))
-    web.run_app(app, host="0.0.0.0", port=port)
+    web.run_app(app, host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
