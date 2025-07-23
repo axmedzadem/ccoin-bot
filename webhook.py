@@ -6,7 +6,6 @@ from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
 API_TOKEN = os.getenv("API_TOKEN")
-
 if not API_TOKEN:
     raise Exception("API_TOKEN environment variable is not set!")
 
@@ -26,7 +25,7 @@ async def start_handler(message: types.Message):
 
 async def on_startup(app):
     await bot.delete_webhook(drop_pending_updates=True)
-    await bot.set_webhook("https://ccoin-bot.onrender.com/")  # öz hosting URL-ni yaz
+    await bot.set_webhook("https://ccoin-bot.onrender.com/")
 
 async def on_shutdown(app):
     await bot.delete_webhook()
@@ -34,7 +33,7 @@ async def on_shutdown(app):
 async def handle(request):
     update_json = await request.json()
     update = types.Update(**update_json)
-    await dp.feed_update(update)  # burda process_update deyil feed_update olmalıdır
+    await dp.feed_update(update)
     return web.Response(text="OK")
 
 app = web.Application()
