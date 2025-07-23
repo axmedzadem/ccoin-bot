@@ -1,12 +1,10 @@
 import os
-import asyncio
+from aiohttp import web
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiohttp import web
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
-API_TOKEN = os.getenv("API_TOKEN")  # Tokeni environment variable-dan oxuyuruq
-
+API_TOKEN = os.getenv("API_TOKEN")
 if not API_TOKEN:
     raise Exception("API_TOKEN environment variable is not set!")
 
@@ -16,24 +14,25 @@ dp = Dispatcher()
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💰 CaspianCoin Al", url="https://caspiancoin.gumroad.com/l/oxnhw")]
+        [InlineKeyboardButton(text="💰 CaspianCoin Al", web_app=WebAppInfo(url="https://caspiancoin.gumroad.com/l/oxnhw"))]
     ])
     await message.answer(
-        text="🌊 CaspianCoin — Xəzər dənizindən ilhamlanan, yerli və dayanıqlı rəqəmsal valyuta.\nAşağıdakı düyməyə kliklə!",
-        reply_markup=keyboard
+        text="🌊 *CaspianCoin* — Xəzərdən ilhamlanan rəqəmsal valyuta\n\nAşağıdakı düyməyə kliklə!",
+        reply_markup=keyboard,
+        parse_mode="Markdown"
     )
 
 async def on_startup(app):
     await bot.delete_webhook(drop_pending_updates=True)
-    await bot.set_webhook("https://ccoin-bot.onrender.com/")  # Burada URL-ni öz domeninlə əvəz et
+    await bot.set_webhook("https://ccoin-bot.onrender.com/")  # Buraya öz servis URL-ni yaz
 
 async def on_shutdown(app):
     await bot.delete_webhook()
 
 async def handle(request):
-    update = await request.json()
-    telegram_update = types.Update(**update)
-    await dp.process_update(telegram_update)
+    data = await request.json()
+    update = types.Update(**data)
+    await dp.feed_update(update)  # Aiogram 3.x-də process_update əvəzinə feed_update istifadə olunur
     return web.Response(text="OK")
 
 app = web.Application()
