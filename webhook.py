@@ -33,7 +33,7 @@ async def on_shutdown(app):
 async def handle(request):
     update_json = await request.json()
     update = types.Update(**update_json)
-    await dp.feed_update(update)
+    await Dispatcher.feed_update(dp, update)  # Düzgün çağırış
     return web.Response(text="OK")
 
 app = web.Application()
