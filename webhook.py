@@ -1,5 +1,6 @@
 import os
 import logging
+import asyncio
 from aiohttp import web
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
@@ -18,22 +19,22 @@ async def cmd_start(message: types.Message):
         [InlineKeyboardButton(text="💰 CaspianCoin Al", web_app=WebAppInfo(url="https://caspiancoin.gumroad.com/l/oxnhw"))]
     ])
     await message.answer(
-        text="🌊 CaspianCoin — Xəzərdən ilhamlanan, yerli və dayanıqlı rəqəmsal valyuta\n\nAşağıdakı düyməyə kliklə!",
+        text="🌊 *CaspianCoin* — Xəzərdən ilhamlanan rəqəmsal valyuta\n\nAşağıdakı düyməyə kliklə!",
         reply_markup=keyboard,
         parse_mode="Markdown"
     )
 
 async def on_startup(app):
     await bot.delete_webhook(drop_pending_updates=True)
-    await bot.set_webhook("https://ccoin-bot.onrender.com/")
+    await bot.set_webhook("https://ccoin-bot.onrender.com/")  # Öz servis URL-nizi burada yazın
 
 async def on_shutdown(app):
     await bot.delete_webhook()
 
 async def handle(request):
-    data = await request.json()
-    print("Gələn update:", data)
-    update = types.Update(**data)
+    update_json = await request.json()
+    print("Gələn mesaj:", update_json)
+    update = types.Update(**update_json)
     await dp.feed_update(update)
     return web.Response(text="OK")
 
